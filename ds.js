@@ -32,7 +32,6 @@ window.ds = function(idpinfo, spinfo) {
     if (authid) {
       authid = authid.split(':').slice(1).join(':');
       entityid = parseQuery(new URL(authid).search)['spentityid'];
-      console.log('entityid', entityid);
     }
   }
 
@@ -48,7 +47,6 @@ window.ds = function(idpinfo, spinfo) {
       console.log('err', err, err.response);
       //return;
     }
-    console.log('res', res);
     if (res) {
       var metadata = new DOMParser().parseFromString(res.responseText, "text/xml");
       var xp = DOMXPath(metadata, resolver);
@@ -85,8 +83,8 @@ window.ds = function(idpinfo, spinfo) {
   }
 
   function readysearch() {
-      //var fedsfilter = "feds:^(" + urlParams["feds"].split(/,/).join("|") + ")$";
-      var fedsfilter = 'feds:^wayf$';
+      var fedsfilter = "feds:^(" + urlParams["feds"].split(/,/).join("|") + ")$";
+      //var fedsfilter = 'feds:^wayf$';
 
       var res = keywordFilter(fedsfilter, idplist, {});
       var newidplist = [];
@@ -115,11 +113,9 @@ window.ds = function(idpinfo, spinfo) {
         // add lowercase latinized names to kv list
         for (var kvname in idplist[i].DisplayNames) {
             kvnames = idplist[i].DisplayNames[kvname].latinise().toLowerCase().split(' ');
-            //console.log(kvnames.join(' # '));
             kvnames.forEach(function (name) {
                 name = name.replace(/[^\w\.\-']/, "");
                 if (idplist[i].kv.indexOf(name) == -1) { // only if not there already
-                    //console.log('kvname', name);
                     idplist[i].kv.push(name);
                 }
             });
@@ -145,7 +141,8 @@ window.ds = function(idpinfo, spinfo) {
       }
 
       idplist = idplist.sort(function (a, b) {
-        return a.DisplayNames < b.DisplayNames ? -1 : 1;
+        return a.DisplayNames.localeCompare(b.DisplayNames, lang);
+        //return a.DisplayNames < b.DisplayNames ? -1 : 1;
       });
 
 
@@ -231,10 +228,10 @@ window.ds = function(idpinfo, spinfo) {
       setselectable(0);
       setselectable(lastselected);
     } else { // return with result
-      //alert("You are being sent to " + idplist[no].DisplayNames + " (" + idplist[no].entityID + ")");
-      //window.location = window.location;
-      var idp = idplist[no].entityID.replace(/birk\.wayf\.dk\/birk\.php\//, '');
-      window.location = urlParams['return'] + '&' + urlParams['returnIDParam'] + '=' + encodeURIComponent(idp);
+      alert("You are being sent to " + idplist[no].DisplayNames + " (" + idplist[no].entityID + ")");
+      window.location = window.location;
+      //var idp = idplist[no].entityID.replace(/birk\.wayf\.dk\/birk\.php\//, '');
+      //window.location = urlParams['return'] + '&' + urlParams['returnIDParam'] + '=' + encodeURIComponent(idp);
     }
   }
 
@@ -316,7 +313,6 @@ window.ds = function(idpinfo, spinfo) {
     var request = new XMLHttpRequest();
 
     request.onreadystatechange = function() {
-        console.log('req', request);
       if (request.readyState == XMLHttpRequest.DONE) {
         if (request.status >= 200 && request.status < 400) {
           callback(null, request);

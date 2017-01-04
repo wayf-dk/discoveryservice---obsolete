@@ -1,3 +1,5 @@
+# This project as been abandoned by WAYF - se wayf-dk/discoveryservice instead
+
 # discoveryservice
 
 Discoveryservice is a SAML IdP discoveryservice that:
